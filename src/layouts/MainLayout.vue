@@ -1,102 +1,67 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <nav>
       <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
-
-        <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
+        <q-space />
+        <div class="links-container">
+          <q-btn v-for="link in linksList" :key="link.title" flat round dense :aria-label="link.title"
+            :class="{ active: isActive(link) }" @click="handleClick(link)">
+            {{ link.title }}
+          </q-btn>
+        </div>
+        <q-space />
       </q-toolbar>
-    </q-header>
-
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
+    </nav>
+    <q-header elevated></q-header>
 
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <AddProduct v-model="dialogVisible" @product-added="getProducts" />
   </q-layout>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+import { ref } from "vue";
+import { useRoute } from "vue-router";
+import AddProduct from "../components/AddProduct.vue";
+
+defineOptions({ name: "MainLayout" });
+
+const dialogVisible = ref(false);
 
 const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
+  { title: "Products", caption: "Products page", icon: "products", hname: "products" },
+  { title: "Store finder", caption: "Find stores", icon: "shop", hname: "store-finder" },
+  { title: "About", caption: "chat.quasar.dev", icon: "chat" },
+  { title: "Contact", caption: "forum.quasar.dev", icon: "record_voice_over" },
+  { title: "Downloads", caption: "@quasarframework", icon: "rss_feed" },
+  { title: "Add Product", icon: "add", action: "openModal" },
+];
+
+const route = useRoute();
+
+function isActive(link) {
+  return route.path === link.link;
+}
+
+function handleClick(link) {
+  if (link.action === "openModal") {
+    dialogVisible.value = true;
   }
-]
-
-const leftDrawerOpen = ref(false)
-
-function toggleLeftDrawer () {
-  leftDrawerOpen.value = !leftDrawerOpen.value
 }
 </script>
+<style scoped>
+.links-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.links-container .q-btn {
+  margin: 0 10px;
+  border-radius: 10px;
+  padding: 10px;
+}
+</style>
