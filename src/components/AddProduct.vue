@@ -38,6 +38,7 @@
 <script>
 import { defineComponent } from "vue";
 import axios from "axios";
+import { eventBus } from 'src/boot/eventBus.js';
 
 export default defineComponent({
   name: "AddProduct",
@@ -88,7 +89,7 @@ export default defineComponent({
           headers: { "Content-Type": "multipart/form-data" },
         });
 
-        this.$emit("product-added", response);
+        eventBus.emit("product-added"); // Emit event globally
         this.resetForm();
         this.closeDialog();
       } catch (error) {
